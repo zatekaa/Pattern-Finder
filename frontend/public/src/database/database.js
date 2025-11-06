@@ -11,6 +11,25 @@ class AssetService {
             etf: window.etfDatabase || [],
             commodities: window.commoditiesDatabase || []
         };
+        this.initialized = false;
+    }
+
+    // Инициализация сервиса
+    initialize() {
+        if (this.initialized) return;
+        
+        // Обновляем базы данных на случай если они загрузились после создания сервиса
+        this.databases = {
+            crypto: window.cryptoDatabase || [],
+            stocks: window.stocksDatabase || [],
+            forex: window.forexDatabase || [],
+            indices: window.indicesDatabase || [],
+            etf: window.etfDatabase || [],
+            commodities: window.commoditiesDatabase || []
+        };
+        
+        this.initialized = true;
+        console.log('✅ AssetService initialized with', this.getStats().total, 'assets');
     }
 
     // Получить все активы
