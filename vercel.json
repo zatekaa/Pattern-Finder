@@ -1,29 +1,14 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "frontend/public/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/public/$1"
-    }
-  ],
+  "buildCommand": "echo 'No build needed'",
+  "outputDirectory": "frontend/public",
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    },
+    {
       "source": "/(.*)",
-      "destination": "/frontend/public/index.html"
+      "destination": "/frontend/public/$1"
     }
   ]
 }
