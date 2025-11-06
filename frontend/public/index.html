@@ -33,7 +33,7 @@
                 const isVercel = window.location.hostname.includes('vercel.app');
                 
                 if (isLocal) {
-                    return `http://localhost:${window.location.port || 9999}/.netlify/functions/auth`;
+                    return `http://localhost:${window.location.port || 9999}/api/auth`;
                 } else if (isVercel) {
                     return '/api/auth';
                 } else {

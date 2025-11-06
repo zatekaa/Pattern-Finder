@@ -6,9 +6,17 @@ class APIClient {
         // Определяем базовый URL для API
         // Автоматически определяем порт из текущего URL
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        this.baseURL = isLocal
-            ? `http://localhost:${window.location.port || 9999}/.netlify/functions`
-            : '/.netlify/functions';
+        
+        // Определяем платформу деплоя (Vercel или Netlify)
+        const isVercel = window.location.hostname.includes('vercel.app');
+        
+        if (isLocal) {
+            this.baseURL = `http://localhost:${window.location.port || 9999}/api`;
+        } else if (isVercel) {
+            this.baseURL = '/api';
+        } else {
+            this.baseURL = '/.netlify/functions';
+        }
     }
 
     /**
@@ -16,6 +24,8 @@ class APIClient {
      */
     async callFunction(functionName, endpoint, params = {}) {
         try {
+            console.log(`🔌 Calling ${this.baseURL}/${functionName}`, { endpoint, params });
+            
             const response = await fetch(`${this.baseURL}/${functionName}`, {
                 method: 'POST',
                 headers: {
@@ -24,9 +34,31 @@ class APIClient {
                 body: JSON.stringify({ endpoint, params })
             });
 
+            // Проверяем тип контента ответа
+            const contentType = response.headers.get('content-type');
+            
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || `HTTP error! status: ${response.status}`);
+                // Пытаемся получить JSON ошибку, если возможно
+                if (contentType && contentType.includes('application/json')) {
+                    try {
+                        const error = await response.json();
+                        throw new Error(error.error || `HTTP error! status: ${response.status}`);
+                    } catch (jsonError) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                } else {
+                    // Если не JSON, читаем как текст
+                    const text = await response.text();
+                    console.error(`Non-JSON response from ${functionName}:`, text.substring(0, 200));
+                    throw new Error(`${functionName} API error`);
+                }
+            }
+
+            // Проверяем, что успешный ответ - это JSON
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error(`Unexpected non-JSON response from ${functionName}:`, text.substring(0, 200));
+                throw new Error(`Unexpected response format from ${functionName}`);
             }
 
             return await response.json();
