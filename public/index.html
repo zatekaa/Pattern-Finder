@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход — MurodTrader</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="stylesheet" href="../assets/css/login-style.css">
+</head>
+<body style="background: var(--bg-primary);">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const secureAuth = {
+            u: [116, 114, 97, 100, 101, 114],
+            p: [77, 117, 114, 111, 100, 55, 55, 55]
+        };
+
+        const decodeSecureData = (data) => data.map(code => String.fromCharCode(code)).join('');
+
+        function LoginPage() {
+            const [username, setUsername] = useState('');
+            const [password, setPassword] = useState('');
+            const [error, setError] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+
+            const validateCredentials = (inputUsername, inputPassword) => {
+                try {
+                    const realUsername = decodeSecureData(secureAuth.u);
+                    const realPassword = decodeSecureData(secureAuth.p);
+                    return inputUsername === realUsername && inputPassword === realPassword;
+                } catch (err) {
+                    console.error('Auth error:', err);
+                    return false;
+                }
+            };
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                if (!username.trim() || !password.trim()) {
+                    setError('Введите имя пользователя и пароль');
+                    return;
+                }
+
+                setIsLoading(true);
+                setError('');
+
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    const isValid = validateCredentials(username, password);
+                    if (isValid) {
+                        sessionStorage.setItem('cryptoview_loggedIn', 'true');
+                        window.location.href = 'home.html';
+                    } else {
+                        setError('Неверное имя пользователя или пароль');
+                    }
+                } catch (err) {
+                    setError('Ошибка при проверке данных');
+                    console.error('Login error:', err);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            return (
+                React.createElement('div', { className: 'react-login-modal' },
+                    React.createElement('div', { className: 'react-login-background' }),
+                    React.createElement('div', { className: 'react-login-container' },
+                        React.createElement('h2', { className: 'react-login-title' }, 'MurodTrader'),
+                        React.createElement('p', { className: 'react-login-subtitle' }, 'Войдите для доступа к аналитике криптовалют'),
+                        React.createElement('form', { className: 'react-login-form', onSubmit: handleSubmit },
+                            React.createElement('div', { className: 'react-form-group' },
+                                React.createElement('label', { className: 'react-form-label', htmlFor: 'react-username' }, 'Имя пользователя'),
+                                React.createElement('input', {
+                                    type: 'text', id: 'react-username', className: 'react-form-input',
+                                    value: username, onChange: (e) => setUsername(e.target.value),
+                                    placeholder: 'Введите имя пользователя', required: true,
+                                    disabled: isLoading, autoComplete: 'username'
+                                })
+                            ),
+                            React.createElement('div', { className: 'react-form-group' },
+                                React.createElement('label', { className: 'react-form-label', htmlFor: 'react-password' }, 'Пароль'),
+                                React.createElement('input', {
+                                    type: 'password', id: 'react-password', className: 'react-form-input',
+                                    value: password, onChange: (e) => setPassword(e.target.value),
+                                    placeholder: 'Введите пароль', required: true, disabled: isLoading,
+                                    autoComplete: 'current-password'
+                                })
+                            ),
+                            React.createElement('button', { type: 'submit', className: 'react-login-btn', disabled: isLoading }, isLoading ? '🔄 Вход...' : 'Войти'),
+                            error && React.createElement('div', { className: 'react-login-error' }, error)
+                        )
+                    )
+                )
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(LoginPage));
+    </script>
+</body>
+</html>
+
+

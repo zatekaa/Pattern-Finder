@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MurodTrader - AI Pattern Finder</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="stylesheet" href="../assets/css/analyze-page.css">
+</head>
+<body>
+    <header class="header" id="main-header">
+        <nav class="nav">
+            <div class="nav-left">
+                <a href="#" class="logo">MurodTrader</a>
+            </div>
+            <div class="nav-right">
+                <div id="react-theme-toggle"></div>
+                <div class="user-info" id="user-info">
+                    <div class="user-avatar">A</div>
+                    <span class="user-name">Админ</span>
+                    <a class="logout-btn" href="index.html">Выйти</a>
+                </div>
+            </div>
+        </nav>
+    </header>   
+
+    <div class="container" id="main-content">
+        <h1 class="main-header">🚀 УНИВЕРСАЛЬНЫЙ ПОИСК ПАТТЕРНОВ - AI АНАЛИЗ</h1>
+        
+        <div class="section-divider"></div>
+        
+        <div id="react-control-panel"></div>
+
+        <div style="margin-top: 2rem;"></div>
+
+        <div id="react-analysis-results"></div>
+        
+        <div id="userInfo">
+            <div class="info-box">
+                <h3 style="font-size: 1.8rem; margin-bottom: 2rem;">🎯 КАК РАБОТАЕТ АНАЛИЗАТОР:</h3>
+                
+                <p style="margin-bottom: 1.5rem;"><strong style="font-size: 1.3rem;">1. 📈 РЕАЛЬНЫЕ ДАННЫЕ:</strong></p>
+                <ul style="margin-bottom: 2rem;">
+                    <li>Система использует <strong>Binance Ticker API</strong> для получения самых актуальных цен в реальном времени</li>
+                    <li>Автоматическое обновление цен каждую секунду через Binance (минимальная задержка)</li>
+                    <li>Исторические данные загружаются с Binance, CoinMarketCap, Kraken и других API</li>
+                    <li>Анализирует исторические данные за последние 2 года</li>
+                    <li>Автоматически обновляет последнюю свечу для актуальности данных</li>
+                </ul>
+                
+                <p style="margin-bottom: 1.5rem;"><strong style="font-size: 1.3rem;">2. 🔍 ИСТОРИЧЕСКИЕ ПАТТЕРНЫ:</strong></p>
+                <ul style="margin-bottom: 2rem;">
+                    <li>Ищет ПЕРИОДЫ, максимально похожие на ваш текущий период</li>
+                    <li>Показывает ТОП-6 самых похожих исторических паттернов</li>
+                    <li>Анализирует что происходило ПОСЛЕ похожих паттернов в прошлом</li>
+                    <li>Показывает год и период каждого найденного паттерна</li>
+                </ul>
+                
+                <p style="margin-bottom: 1.5rem;"><strong style="font-size: 1.3rem;">3. 📊 СТАТИСТИКА И АНАЛИЗ:</strong></p>
+                <ul style="margin-bottom: 2rem;">
+                    <li>Рассчитывает среднюю доходность исторических паттернов</li>
+                    <li>Определяет процент успешных исходов</li>
+                    <li>Показывает лучшие и худшие сценарии</li>
+                    <li>Дает рекомендацию на основе статистики</li>
+                </ul>
+                
+                <p style="margin-bottom: 1.5rem;"><strong style="font-size: 1.3rem;">⚡ ПОДДЕРЖИВАЕМЫЕ АКТИВЫ:</strong></p>
+                <ul>
+                    <li><strong>Криптовалюты (150 монет):</strong> BTC, ETH, BNB, SOL, XRP, ADA, DOGE, TRX, DOT, MATIC, AVAX, LINK, UNI, LTC, BCH, AAVE, FIL, ARB, OP, APT, NEAR, PEPE, SHIB, WIF, BONK, FLOKI, SEI, SUI, TIA, JUP, ORDI, MEME, TAO, RNDR, FET, AGIX, OCEAN, GRT, ROSE, SNX, CRV, SUSHI и многие другие</li>
+                    <li><strong>Акции (200 компаний):</strong> AAPL, MSFT, GOOGL, AMZN, META, NVDA, TSLA, NFLX, AMD, INTC, JPM, BAC, WFC, GS, JNJ, PFE, WMT, HD, COST, NKE, SBUX, BA, CAT, XOM, CVX, SHOP, SQ, TWLO, ZM, DOCU, DDOG, NET, CRWD, UBER, ABNB, DASH и другие</li>
+                    <li><strong>Индексы (100 индексов):</strong> ^GSPC (S&P 500), ^DJI (Dow Jones), ^IXIC (NASDAQ), ^NDX (NASDAQ-100), ^RUT (Russell 2000), ^VIX, ^FTSE, ^GDAXI (DAX), ^FCHI (CAC 40), ^N225 (Nikkei), ^HSI (Hang Seng), ^TOPX, ^KOSPI, ^BVSP и многие другие мировые индексы</li>
+                    <li><strong>Форекс (100 пар):</strong> EURUSD, GBPUSD, USDJPY, USDCHF, AUDUSD, USDCAD, NZDUSD, EURGBP, EURJPY, GBPJPY, AUDJPY, EURNOK, EURSEK, GBPNOK, USDTRY, USDMXN и другие мажорные, кросс и экзотические пары</li>
+                    <li><strong>ETF (100 фондов):</strong> SPY, QQQ, IWM, DIA, VTI, VOO, XLK, XLF, XLE, XLV, ARKK, EEM, VEA, AGG, BND, TLT, SCHD, VIG, ICLN, TAN, LIT, BOTZ, HACK, BITO и другие</li>
+                    <li><strong>Товары (100 активов):</strong> XAUUSD (Золото), XAGUSD (Серебро), XPTUSD (Платина), XPDUSD (Палладий), USOIL (Нефть WTI), UKOIL (Нефть Brent), NGAS (Природный газ), GLD, SLV, USO, UNG, COPX, DBA, CORN, WEAT, SOYB, URA, KRBN и другие</li>
+                    <li><strong>🎯 ВСЕГО 750 АКТИВОВ В БАЗЕ ДАННЫХ!</strong></li>
+                    <li><strong>✨ Все данные обновляются в реальном времени через профессиональные API!</strong></li>
+                </ul>
+            </div>
+            <div class="section-divider"></div>
+            
+            <p class="section-title" style="text-align: center;">👆 ВВЕДИТЕ СИМВОЛ АКТИВА И НАЖМИТЕ "АНАЛИЗИРОВАТЬ ПАТТЕРНЫ" ДЛЯ ЗАПУСКА АНАЛИЗА</p>
+        </div>
+    </div>
+
+    <!-- Конфигурация и утилиты -->
+    <script src="../src/utils/toast-notifications.js"></script>
+    <script src="../src/utils/config.js"></script>
+    <script src="../src/utils/api-client.js"></script>
+    <script src="../src/utils/cache-manager.js"></script>
+    <script src="../src/utils/error-handler.js"></script>
+    
+    <!-- База данных активов (ДОЛЖНА БЫТЬ ДО AUTOCOMPLETE!) -->
+    <script src="../src/database/crypto-database.js"></script>
+    <script src="../src/database/stocks-database.js"></script>
+    <script src="../src/database/forex-database.js"></script>
+    <script src="../src/database/indices-database.js"></script>
+    <script src="../src/database/etf-database.js"></script>
+    <script src="../src/database/commodities-database.js"></script>
+    <script src="../src/database/database.js"></script>
+    
+    <!-- Автодополнение (после баз данных) -->
+    <script src="../src/utils/autocomplete.js"></script>
+    
+    <!-- Основной код -->
+    <script src="../src/core/analyzer.js"></script>
+    
+    <!-- React компоненты -->
+    <script type="text/babel" src="../src/components/analysis-results.jsx"></script>
+    <script type="text/babel" src="../src/components/control-panel.jsx"></script>
+    <script type="text/babel" src="../src/components/theme-toggle.jsx"></script>
+</body>
+</html>
