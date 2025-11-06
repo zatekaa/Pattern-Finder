@@ -3,12 +3,19 @@
 
 class APIClient {
     constructor() {
-        // Определяем базовый URL для API
-        // Автоматически определяем порт из текущего URL
+        // Определяем базовый URL для API (поддержка Netlify и Vercel)
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        this.baseURL = isLocal
-            ? `http://localhost:${window.location.port || 9999}/.netlify/functions`
-            : '/.netlify/functions';
+        const isVercel = window.location.hostname.includes('vercel.app');
+        
+        if (isLocal) {
+            this.baseURL = `http://localhost:${window.location.port || 9999}/.netlify/functions`;
+        } else if (isVercel) {
+            this.baseURL = '/api';
+        } else {
+            this.baseURL = '/.netlify/functions';
+        }
+        
+        console.log('🔌 API Client initialized:', this.baseURL);
     }
 
     /**
