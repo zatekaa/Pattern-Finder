@@ -144,6 +144,16 @@ class AssetService {
     assetExists(symbol) {
         return this.findAsset(symbol) !== null;
     }
+
+    // Проверить поддерживается ли актив (алиас для assetExists)
+    isAssetSupported(symbol) {
+        return this.assetExists(symbol);
+    }
+
+    // Получить информацию об активе
+    getAssetInfo(symbol) {
+        return this.findAsset(symbol);
+    }
 }
 
 // Создаем глобальный экземпляр сервиса
