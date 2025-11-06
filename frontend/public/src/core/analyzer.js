@@ -847,8 +847,8 @@ class FinancialDataAPI {
                     data = await this.getStockDataMulti(symbol, interval, period);
                 }
             } catch (primaryError) {
-                console.warn(`Primary API failed for ${symbol}, trying fallback...`);
-                data = await this.generateFallbackData(symbol, period, interval);
+                console.error(`Primary API failed for ${symbol}:`, primaryError.message);
+                throw primaryError; // Пробрасываем ошибку дальше
             }
             
             if (!data || !Array.isArray(data) || data.length === 0) {
@@ -912,8 +912,8 @@ class FinancialDataAPI {
                         try {
                             return await this.getCoinMarketCapData(symbol, interval, period);
                         } catch (cmcError) {
-                            console.warn(`All APIs failed for ${symbol}, generating fallback data...`);
-                            return this.generateFallbackData(symbol, period, interval);
+                            console.error(`All crypto APIs failed for ${symbol}`);
+                            throw new Error(`Не удалось получить данные для ${symbol}. Все крипто API вернули ошибку. Проверьте правильность символа.`);
                         }
                     }
                 }
@@ -937,8 +937,8 @@ class FinancialDataAPI {
                     try {
                         return await this.getCoinbaseData(symbol, interval, 300);
                     } catch (coinbaseError) {
-                        console.warn(`All crypto APIs failed for ${symbol}, generating fallback data...`);
-                        return this.generateFallbackData(symbol, period, interval);
+                        console.error(`All crypto APIs failed for ${symbol}`);
+                        throw new Error(`Не удалось получить данные для ${symbol}. Все крипто API недоступны. Попробуйте позже.`);
                     }
                 }
             }
@@ -1232,8 +1232,8 @@ class FinancialDataAPI {
                                 console.log(`🔄 Пробуем Alpha Vantage для ${symbol}...`);
                                 return await this.getAlphaVantageData(symbol, interval);
                             } catch (avError) {
-                                console.warn(`All stock APIs failed for ${symbol}, generating fallback data...`);
-                                return this.generateFallbackData(symbol, period, interval);
+                                console.error(`All stock APIs failed for ${symbol}`);
+                                throw new Error(`Не удалось получить данные для ${symbol}. Все API вернули ошибку. Попробуйте другой актив или проверьте символ.`);
                             }
                         }
                     }
