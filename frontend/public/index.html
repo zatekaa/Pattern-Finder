@@ -26,12 +26,19 @@
             const [error, setError] = useState('');
             const [isLoading, setIsLoading] = useState(false);
 
-            // Определяем URL для API (локально или продакшен)
+            // Определяем URL для API (работает и с Netlify и с Vercel)
             const getApiUrl = () => {
                 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                return isLocal 
-                    ? `http://localhost:${window.location.port || 9999}/.netlify/functions/auth`
-                    : '/.netlify/functions/auth';
+                // Проверяем на каком сервисе мы
+                const isVercel = window.location.hostname.includes('vercel.app');
+                
+                if (isLocal) {
+                    return `http://localhost:${window.location.port || 9999}/.netlify/functions/auth`;
+                } else if (isVercel) {
+                    return '/api/auth';
+                } else {
+                    return '/.netlify/functions/auth';
+                }
             };
 
             const handleSubmit = async (e) => {
