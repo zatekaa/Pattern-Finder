@@ -20,28 +20,18 @@
     <script type="text/babel">
         const { useState } = React;
 
-        const secureAuth = {
-            u: [116, 114, 97, 100, 101, 114],
-            p: [77, 117, 114, 111, 100, 55, 55, 55]
-        };
-
-        const decodeSecureData = (data) => data.map(code => String.fromCharCode(code)).join('');
-
         function LoginPage() {
             const [username, setUsername] = useState('');
             const [password, setPassword] = useState('');
             const [error, setError] = useState('');
             const [isLoading, setIsLoading] = useState(false);
 
-            const validateCredentials = (inputUsername, inputPassword) => {
-                try {
-                    const realUsername = decodeSecureData(secureAuth.u);
-                    const realPassword = decodeSecureData(secureAuth.p);
-                    return inputUsername === realUsername && inputPassword === realPassword;
-                } catch (err) {
-                    console.error('Auth error:', err);
-                    return false;
-                }
+            // Определяем URL для API (локально или продакшен)
+            const getApiUrl = () => {
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                return isLocal 
+                    ? `http://localhost:${window.location.port || 9999}/.netlify/functions/auth`
+                    : '/.netlify/functions/auth';
             };
 
             const handleSubmit = async (e) => {
@@ -55,13 +45,24 @@
                 setError('');
 
                 try {
-                    await new Promise(resolve => setTimeout(resolve, 800));
-                    const isValid = validateCredentials(username, password);
-                    if (isValid) {
+                    // Отправляем запрос на Netlify Function для проверки
+                    const response = await fetch(getApiUrl(), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Сохраняем токен в sessionStorage
                         sessionStorage.setItem('cryptoview_loggedIn', 'true');
+                        sessionStorage.setItem('auth_token', data.token);
                         window.location.href = 'home.html';
                     } else {
-                        setError('Неверное имя пользователя или пароль');
+                        setError(data.message || 'Неверное имя пользователя или пароль');
                     }
                 } catch (err) {
                     setError('Ошибка при проверке данных');
