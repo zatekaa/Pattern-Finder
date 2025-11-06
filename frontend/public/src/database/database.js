@@ -16,7 +16,9 @@ class AssetService {
 
     // Инициализация сервиса
     initialize() {
-        if (this.initialized) return;
+        if (this.initialized) {
+            return Promise.resolve();
+        }
         
         // Обновляем базы данных на случай если они загрузились после создания сервиса
         this.databases = {
@@ -29,7 +31,27 @@ class AssetService {
         };
         
         this.initialized = true;
-        console.log('✅ AssetService initialized with', this.getStats().total, 'assets');
+        const stats = this.getStats();
+        console.log('✅ AssetService initialized with', stats.total, 'assets');
+        console.log('📊 Breakdown:', stats);
+        
+        return Promise.resolve();
+    }
+    
+    // Обновить базы данных (вызывается после загрузки всех баз)
+    refresh() {
+        this.databases = {
+            crypto: window.cryptoDatabase || [],
+            stocks: window.stocksDatabase || [],
+            forex: window.forexDatabase || [],
+            indices: window.indicesDatabase || [],
+            etf: window.etfDatabase || [],
+            commodities: window.commoditiesDatabase || []
+        };
+        
+        const stats = this.getStats();
+        console.log('🔄 AssetService refreshed:', stats.total, 'assets');
+        return stats;
     }
 
     // Получить все активы
@@ -127,5 +149,19 @@ class AssetService {
 // Создаем глобальный экземпляр сервиса
 window.AssetService = new AssetService();
 
+// Функция для обновления баз данных после их загрузки
+window.refreshAssetDatabase = function() {
+    if (window.AssetService) {
+        return window.AssetService.refresh();
+    }
+};
+
 // Выводим статистику в консоль
-console.log('📊 Asset Database loaded:', window.AssetService.getStats());
+console.log('📊 Asset Database service created');
+
+// Обновляем базы через небольшую задержку, чтобы дать время загрузиться всем скриптам
+setTimeout(() => {
+    if (window.AssetService) {
+        window.AssetService.refresh();
+    }
+}, 100);
