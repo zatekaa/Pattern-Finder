@@ -110,7 +110,8 @@ function UnifiedChart({ symbol, onPatternAnalyzed }) {
         
         // Используем backend API вместо прямого обращения к Binance
         const toDate = new Date().toISOString().split('T')[0];
-        const fromDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 1 год назад
+        // 🔥 ЗАПРАШИВАЕМ 20 ЛЕТ ИСТОРИИ
+        const fromDate = new Date(Date.now() - 20 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         
         try {
             const url = `/api/data?symbol=${symbol}&fromDate=${fromDate}&toDate=${toDate}&interval=1d`;
@@ -129,28 +130,26 @@ function UnifiedChart({ symbol, onPatternAnalyzed }) {
             }
             
             console.log(`✅ Получено ${data.length} свечей через backend`);
+            console.log(`📊 Первая свеча:`, data[0]);
+            console.log(`📊 Последняя свеча:`, data[data.length - 1]);
             
-            // Конвертируем в нужный формат
-            return data.map(candle => {
-                // Парсим дату (может быть в разных форматах)
-                let timestamp;
-                if (typeof candle.Date === 'number') {
-                    timestamp = candle.Date;
-                } else {
-                    const date = new Date(candle.Date);
-                    timestamp = date.getTime() / 1000;
-                }
+            // Конвертируем в формат для графика
+            const candles = data.map(candle => {
+                // Парсим дату
+                const date = new Date(candle.Date);
                 
                 return {
-                    time: timestamp,
-                    Date: candle.Date, // Сохраняем оригинальную дату
-                    open: candle.Open,
-                    high: candle.High,
-                    low: candle.Low,
-                    close: candle.Close,
-                    volume: candle.Volume
+                    Date: candle.Date,
+                    Open: parseFloat(candle.Open),
+                    High: parseFloat(candle.High),
+                    Low: parseFloat(candle.Low),
+                    Close: parseFloat(candle.Close),
+                    Volume: parseFloat(candle.Volume || 0)
                 };
             });
+            
+            console.log(`✅ Конвертировано ${candles.length} свечей для графика`);
+            return candles;
         } catch (error) {
             console.error(`❌ Ошибка загрузки через backend: ${error.message}`);
             throw error;
