@@ -1,17 +1,33 @@
 {
-  "name": "murodtrader-pattern-finder",
-  "version": "1.0.0",
-  "description": "AI Pattern Finder for Crypto, Stocks, Forex, and ETFs",
-  "main": "index.html",
+  "name": "pattern-finder",
+  "version": "4.0.0",
+  "description": "Pattern Finder v4.0 - Точный поиск паттернов (Node.js Edition)",
+  "main": "backend/server.js",
   "scripts": {
-    "dev": "netlify dev",
-    "build": "echo 'Static site - no build needed'"
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js"
   },
   "dependencies": {
-    "node-fetch": "^2.6.7"
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "node-fetch": "^2.7.0",
+    "axios": "^1.6.0",
+    "compression": "^1.7.4",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "moment": "^2.29.4"
   },
-  "devDependencies": {},
-  "keywords": ["trading", "crypto", "ai", "pattern-finder"],
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "trading",
+    "crypto",
+    "ai",
+    "pattern-finder"
+  ],
   "author": "MurodTrader",
   "license": "MIT"
 }

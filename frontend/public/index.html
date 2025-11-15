@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход — MurodTrader</title>
+    
+    <!-- 🚫 ПОЛНОЕ ОТКЛЮЧЕНИЕ КЕШИРОВАНИЯ -->
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +17,7 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/login-style.css">
+    <link rel="stylesheet" href="./assets/css/login-style.css">
 </head>
 <body style="background: var(--bg-primary);">
     <div id="root"></div>
@@ -52,7 +57,27 @@
                 setError('');
 
                 try {
-                    // Отправляем запрос на Netlify Function для проверки
+                    // Для локальной разработки - простая проверка
+                    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                    
+                    if (isLocal) {
+                        // Локальная проверка для разработки
+                        const VALID_USERNAME = 'trader';
+                        const VALID_PASSWORD = 'Murod777';
+                        
+                        if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+                            sessionStorage.setItem('cryptoview_loggedIn', 'true');
+                            sessionStorage.setItem('auth_token', btoa(`${username}:${Date.now()}`));
+                            window.location.href = 'home.html';
+                            return;
+                        } else {
+                            setError('Неверное имя пользователя или пароль');
+                            setIsLoading(false);
+                            return;
+                        }
+                    }
+                    
+                    // Для продакшена - используем Netlify Function
                     const response = await fetch(getApiUrl(), {
                         method: 'POST',
                         headers: {

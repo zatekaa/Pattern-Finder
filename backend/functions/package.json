@@ -1,8 +1,0 @@
-{
-  "name": "murodtrader-functions",
-  "version": "1.0.0",
-  "description": "Netlify Functions for MurodTrader API proxying",
-  "dependencies": {
-    "node-fetch": "^2.6.7"
-  }
-}

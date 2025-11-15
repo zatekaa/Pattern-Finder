@@ -121,4 +121,5 @@ const COMMODITIES_DATABASE = [
 // Делаем доступным глобально
 if (typeof window !== 'undefined') {
     window.COMMODITIES_DATABASE = COMMODITIES_DATABASE;
+    window.commoditiesDatabase = COMMODITIES_DATABASE; // Для AssetService
 }

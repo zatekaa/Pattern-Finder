@@ -248,4 +248,5 @@ const STOCKS_DATABASE = [
 // Делаем доступным глобально
 if (typeof window !== 'undefined') {
     window.STOCKS_DATABASE = STOCKS_DATABASE;
+    window.stocksDatabase = STOCKS_DATABASE; // Для AssetService
 }

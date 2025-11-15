@@ -163,4 +163,5 @@ const CRYPTO_DATABASE = [
 // Делаем доступным глобально
 if (typeof window !== 'undefined') {
     window.CRYPTO_DATABASE = CRYPTO_DATABASE;
+    window.cryptoDatabase = CRYPTO_DATABASE; // Для AssetService
 }

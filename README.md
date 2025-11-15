@@ -1,208 +1,105 @@
-# 🚀 MurodTrader - AI Pattern Finder
+# 🚀 Pattern Finder v4.0
 
-Профессиональный инструмент для технического анализа финансовых рынков с использованием исторических паттернов и AI-алгоритмов.
+Точный поиск паттернов на финансовых рынках с использованием алгоритма DTW (Dynamic Time Warping).
 
-## 🌐 Live Demo
-
-**https://murod77.netlify.app**
-
----
-
-## 📁 Структура Проекта
+## 📁 Структура проекта
 
 ```
-📦 MurodTrader/
-├── 📁 public/                    # HTML страницы
-│   ├── index.html               # Страница входа
-│   ├── home.html                # Главная страница анализатора
-│   └── test-functions.html      # Тестирование API функций
+second version/
+├── backend/              # Серверная часть (Node.js)
+│   ├── server.js        # Основной сервер Express
+│   ├── data-loader.js   # Загрузка данных с Binance/EOD
+│   └── dtw-matcher.js   # Алгоритм поиска паттернов (DTW)
 │
-├── 📁 assets/                    # Статические ресурсы
-│   └── 📁 css/                  # Стили
-│       ├── analyze-page.css     # Стили главной страницы
-│       └── login-style.css      # Стили страницы входа
+├── frontend/            # Клиентская часть
+│   └── public/
+│       ├── index.html   # Страница входа
+│       ├── home.html    # Главная страница приложения
+│       ├── src/
+│       │   ├── components/  # React компоненты
+│       │   ├── core/        # Основная логика (analyzer)
+│       │   ├── utils/       # Утилиты и хелперы
+│       │   └── database/    # Базы данных активов
+│       └── assets/
+│           └── css/         # Стили
 │
-├── 📁 src/                       # Исходный код
-│   ├── 📁 core/                 # Основная логика
-│   │   └── analyzer.js          # Главный модуль анализа (108KB)
-│   │
-│   ├── 📁 database/             # Базы данных активов
-│   │   ├── crypto-database.js   # 150 криптовалют
-│   │   ├── stocks-database.js   # 200 акций
-│   │   ├── indices-database.js  # 100 индексов
-│   │   ├── forex-database.js    # 100 валютных пар
-│   │   ├── etf-database.js      # 100 ETF
-│   │   ├── commodities-database.js # 100 товаров
-│   │   └── database.js          # Центральная база данных
-│   │
-│   ├── 📁 utils/                # Утилиты и вспомогательные модули
-│   │   ├── api-client.js        # API клиент для Netlify Functions
-│   │   ├── config.js            # Конфигурация приложения
-│   │   ├── cache-manager.js     # Управление кэшем
-│   │   ├── error-handler.js     # Обработка ошибок
-│   │   ├── toast-notifications.js # Уведомления
-│   │   └── autocomplete.js      # Автодополнение поиска
-│   │
-│   └── 📁 components/           # React компоненты
-│       ├── analysis-results.jsx # Результаты анализа
-│       ├── control-panel.jsx    # Панель управления
-│       └── theme-toggle.jsx     # Переключатель темы
+├── docs/                # Документация
+│   ├── README.md        # Основная документация
+│   ├── SETUP.md         # Инструкции по установке
+│   └── SUPPORTED_ASSETS.md  # Список поддерживаемых активов
 │
-├── 📁 functions/                 # Netlify Serverless Functions
-│   ├── twelvedata.js            # Twelve Data API
-│   ├── polygon.js               # Polygon.io API
-│   ├── finnhub.js               # Finnhub API
-│   ├── yahoo.js                 # Yahoo Finance API
-│   ├── alphavantage.js          # Alpha Vantage API
-│   ├── binance.js               # Binance API
-│   ├── coinmarketcap.js         # CoinMarketCap API
-│   └── package.json             # Зависимости функций
+├── scripts/             # Скрипты запуска
+│   └── START.bat        # Автоматический запуск (Windows)
 │
-├── 📁 docs/                      # Документация
-│   ├── README.md                # Основная документация
-│   ├── DEPLOYMENT_GUIDE.md      # Руководство по деплою
-│   └── ... (другие .md файлы)
-│
-├── 📁 config/                    # Конфигурационные файлы
-│   ├── netlify.toml             # Конфигурация Netlify (старая)
-│   ├── .netlifyrc               # Настройки Netlify CLI
-│   ├── _redirects               # Правила редиректов
-│   └── .env.example             # Пример переменных окружения
-│
-├── netlify.toml                  # Основная конфигурация Netlify
-├── package.json                  # Зависимости проекта
-├── .env                          # Переменные окружения (не в Git)
-├── .gitignore                    # Игнорируемые файлы
-└── README.md                     # Этот файл
+├── .env                 # Переменные окружения (API ключи)
+├── .env.example         # Пример файла .env
+├── package.json         # Зависимости Node.js
+└── node_modules/        # Установленные пакеты
 ```
 
----
+## 🚀 Быстрый старт
 
-## 🎯 Возможности
-
-### 📊 **750+ Активов в Базе Данных**
-- **Криптовалюты (150):** BTC, ETH, BNB, SOL, XRP, ADA, DOGE, и другие
-- **Акции (200):** AAPL, MSFT, GOOGL, AMZN, META, NVDA, TSLA, и другие
-- **Индексы (100):** S&P 500, NASDAQ, Dow Jones, DAX, Nikkei, и другие
-- **Форекс (100):** EURUSD, GBPUSD, USDJPY, и другие валютные пары
-- **ETF (100):** SPY, QQQ, VTI, VOO, и другие фонды
-- **Товары (100):** Золото, Серебро, Нефть, Газ, и другие
-
-### 🔌 **7 API Интеграций**
-- Twelve Data - Исторические данные
-- Polygon.io - Рыночные данные США
-- Finnhub - Финансовые данные
-- Yahoo Finance - Глобальные рынки
-- Alpha Vantage - Технический анализ
-- Binance - Криптовалюты в реальном времени
-- CoinMarketCap - Криптовалютные данные
-
-### 🤖 **AI Анализ Паттернов**
-- Поиск исторических паттернов
-- Статистический анализ
-- Прогнозирование на основе истории
-- Визуализация данных с Plotly.js
-
----
-
-## 🛠 Технологии
-
-- **Frontend:** React 18, JavaScript ES6+, HTML5, CSS3
-- **Backend:** Netlify Functions (Node.js Serverless)
-- **APIs:** Multiple financial data providers
-- **Deployment:** Netlify
-- **Charts:** Plotly.js
-- **Build:** esbuild (для функций)
-
----
-
-## 🚀 Быстрый Старт
-
-### Первая настройка:
-
-1. **Установите Git:** https://git-scm.com/download/win
-2. **Запустите скрипт:**
-   ```powershell
-   .\setup-git.ps1
-   ```
-3. **Следуйте инструкциям** в скрипте
-
-### Обновление кода:
-
-После любых изменений просто запустите:
-```powershell
-.\update.ps1
-```
-
-Netlify автоматически задеплоит изменения!
-
----
-
-## 💻 Локальная разработка:
-
-```powershell
-# Запустите локальный сервер
-netlify dev
-```
-
-Откройте http://localhost:9999
-
----
-
-## 📦 Деплой на Netlify
-
-### Через CLI:
-
+### Windows:
 ```bash
-# Деплой на продакшен
-netlify deploy --prod --dir "public" --functions "functions"
+# Запустить скрипт
+scripts\START.bat
 ```
 
-### Через GitHub (Рекомендуется):
+### Вручную:
+```bash
+# 1. Установить зависимости
+npm install
 
-1. Загрузите код на GitHub
-2. Подключите репозиторий к Netlify
-3. Netlify автоматически деплоит при каждом push
+# 2. Настроить .env файл
+# Скопируйте .env.example в .env и добавьте свой EOD_API_KEY
 
----
+# 3. Запустить сервер
+npm start
 
-## 🔐 Переменные Окружения
-
-Добавьте в Netlify Dashboard → Site settings → Environment variables:
-
+# 4. Открыть браузер
+http://localhost:3000
 ```
-TWELVE_DATA_API_KEY=your_key_here
-POLYGON_API_KEY=your_key_here
-FINNHUB_API_KEY=your_key_here
-ALPHA_VANTAGE_API_KEY=your_key_here
-COINMARKETCAP_API_KEY=your_key_here
-```
-
----
 
 ## 📖 Документация
 
 Полная документация находится в папке `docs/`:
-- [Руководство по деплою](docs/DEPLOYMENT_GUIDE.md)
-- [API документация](docs/)
+- [README.md](docs/README.md) - Подробное описание
+- [SETUP.md](docs/SETUP.md) - Инструкции по установке
+- [SUPPORTED_ASSETS.md](docs/SUPPORTED_ASSETS.md) - Поддерживаемые активы
 
----
+## 🔑 API Ключи
 
-## 👤 Автор
+Проект поддерживает несколько API для максимального покрытия активов:
 
-**MurodTrader**
+### Для форекс (рекомендуется все 3):
+1. **Twelve Data** (1436 пар) - https://twelvedata.com
+2. **Alpha Vantage** (Bid/Ask спред) - https://www.alphavantage.co
+3. **EOD Historical Data** (фоллбэк) - https://eodhistoricaldata.com
 
----
+### Для криптовалют:
+- **Binance API** - бесплатно, без ключа
 
-## 📄 Лицензия
+Добавьте ключи в `.env` файл (см. `.env.example`)
 
-MIT License
+## 🛠️ Технологии
 
----
+- **Backend:** Node.js, Express
+- **Frontend:** React, Lightweight Charts, Plotly.js
+- **Алгоритмы:** DTW, Pattern Fingerprint
+- **API:** Binance, Twelve Data, Alpha Vantage, EOD Historical Data
 
-## 🙏 Благодарности
+## 📊 Возможности
 
-- Twelve Data за API
-- Netlify за хостинг
-- React за фреймворк
-- Plotly за графики
+- ✅ Поиск похожих паттернов в исторических данных
+- ✅ Поддержка криптовалют, акций, форекса, индексов
+- ✅ Интерактивные графики с выделением областей
+- ✅ Прогнозирование на основе исторических паттернов
+- ✅ Автоматический анализ с ML алгоритмами
+
+## 📝 Лицензия
+
+MIT License - см. LICENSE файл
+
+## 👨‍💻 Автор
+
+MurodTrader

@@ -173,4 +173,5 @@ const ETF_DATABASE = [
 // Делаем доступным глобально
 if (typeof window !== 'undefined') {
     window.ETF_DATABASE = ETF_DATABASE;
+    window.etfDatabase = ETF_DATABASE; // Для AssetService
 }

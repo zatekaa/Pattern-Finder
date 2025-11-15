@@ -4,21 +4,24 @@
 class APIClient {
     constructor() {
         // Определяем базовый URL для API
-        // Автоматически определяем порт из текущего URL
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         
         // Определяем платформу деплоя (Vercel или Netlify)
         const isVercel = window.location.hostname.includes('vercel.app');
         
         if (isLocal) {
-            this.baseURL = `http://localhost:${window.location.port || 9999}/api`;
+            // Используем локальный Node.js сервер на порту 3000
+            this.baseURL = '/api';
+            this.isProxyMode = false;
         } else if (isVercel) {
             this.baseURL = '/api';
+            this.isProxyMode = false;
         } else {
             this.baseURL = '/.netlify/functions';
+            this.isProxyMode = false;
         }
         
-        console.log('🔌 API Client initialized:', this.baseURL);
+        console.log(`🔧 API Client initialized: ${this.baseURL} (Proxy mode: ${this.isProxyMode})`);
     }
 
     /**
@@ -110,6 +113,42 @@ class APIClient {
      */
     async alphavantage(params = {}) {
         return this.callFunction('alphavantage', '', params);
+    }
+
+    /**
+     * EOD Historical Data API (ОСНОВНОЙ - $99.99/мес)
+     */
+    async eodhistoricaldata(endpoint, params = {}) {
+        return this.callFunction('eodhistoricaldata', endpoint, params);
+    }
+
+    /**
+     * Получить intraday данные с EOD Historical (минутные)
+     */
+    async getEODIntraday(symbol, interval = '1m', from = null, to = null) {
+        const params = { interval };
+        if (from) params.from = from;
+        if (to) params.to = to;
+        
+        return this.eodhistoricaldata(`/intraday/${symbol}`, params);
+    }
+
+    /**
+     * Получить end-of-day данные с EOD Historical (дневные)
+     */
+    async getEODHistorical(symbol, from = null, to = null, period = 'd') {
+        const params = { period };
+        if (from) params.from = from;
+        if (to) params.to = to;
+        
+        return this.eodhistoricaldata(`/eod/${symbol}`, params);
+    }
+
+    /**
+     * Получить fundamental данные с EOD Historical
+     */
+    async getEODFundamentals(symbol) {
+        return this.eodhistoricaldata(`/fundamentals/${symbol}`, {});
     }
 
     /**

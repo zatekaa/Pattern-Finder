@@ -126,4 +126,5 @@ const INDICES_DATABASE = [
 // Делаем доступным глобально
 if (typeof window !== 'undefined') {
     window.INDICES_DATABASE = INDICES_DATABASE;
+    window.indicesDatabase = INDICES_DATABASE; // Для AssetService
 }

@@ -105,4 +105,5 @@ const FOREX_DATABASE = [
 // Делаем доступным глобально
 if (typeof window !== 'undefined') {
     window.FOREX_DATABASE = FOREX_DATABASE;
+    window.forexDatabase = FOREX_DATABASE; // Для AssetService
 }
