@@ -28,13 +28,16 @@ class DataLoader {
   async loadData(symbol, fromDate, toDate, interval = '1d') {
     console.log(`📊 Загрузка данных: ${symbol}, ${fromDate} - ${toDate}, ${interval}`);
 
-    // Проверяем кеш
     const cacheKey = `${symbol}_${fromDate}_${toDate}_${interval}`;
-    const cached = this._getFromCache(cacheKey);
-    if (cached) {
-      console.log(`✅ Данные из кеша: ${cached.length} свечей`);
-      return cached;
-    }
+    
+    // ⚠️ ВРЕМЕННО ОТКЛЮЧАЕМ КЕШ для отладки
+    // const cached = this._getFromCache(cacheKey);
+    // if (cached) {
+    //   console.log(`📦 Данные из кеша: ${symbol} (${cached.length} свечей)`);
+    //   return cached;
+    // }
+    
+    console.log(`🔥 КЕШ ОТКЛЮЧЕН - загружаем свежие данные для ${symbol}`);
 
     // Определяем тип актива и источник
     const assetType = this._detectAssetType(symbol);
@@ -328,17 +331,34 @@ class DataLoader {
       throw new Error('EOD API key not configured');
     }
 
+    // 🔥 КОНВЕРТИРУЕМ СИМВОЛ ДЛЯ EODHD
+    let eodSymbol = symbol;
+    
+    // Для крипто: BTC → BTC-USD.CC
+    const cryptoSymbols = ['BTC', 'ETH', 'BNB', 'XRP', 'ADA', 'SOL', 'DOT', 'DOGE', 'AVAX', 'MATIC'];
+    const upperSymbol = symbol.toUpperCase();
+    
+    for (const crypto of cryptoSymbols) {
+      if (upperSymbol.startsWith(crypto) || upperSymbol === crypto) {
+        eodSymbol = `${crypto}-USD.CC`;
+        console.log(`🔄 Конвертируем ${symbol} → ${eodSymbol} для EODHD`);
+        break;
+      }
+    }
+
     // Определяем endpoint
     const isIntraday = ['1m', '5m', '15m', '30m', '1h'].includes(interval);
     
     let url;
     if (isIntraday) {
       // Intraday данные
-      url = `https://eodhistoricaldata.com/api/intraday/${symbol}?api_token=${this.eodApiKey}&interval=${interval}&from=${fromDate}&to=${toDate}&fmt=json`;
+      url = `https://eodhistoricaldata.com/api/intraday/${eodSymbol}?api_token=${this.eodApiKey}&interval=${interval}&from=${fromDate}&to=${toDate}&fmt=json`;
     } else {
       // Дневные данные
-      url = `https://eodhistoricaldata.com/api/eod/${symbol}?api_token=${this.eodApiKey}&from=${fromDate}&to=${toDate}&fmt=json`;
+      url = `https://eodhistoricaldata.com/api/eod/${eodSymbol}?api_token=${this.eodApiKey}&from=${fromDate}&to=${toDate}&fmt=json`;
     }
+    
+    console.log(`📊 EODHD запрос: ${url.replace(this.eodApiKey, 'API_KEY')}`);
 
     const response = await fetch(url);
     
@@ -347,6 +367,12 @@ class DataLoader {
     }
 
     const data = await response.json();
+    
+    console.log(`✅ EODHD вернул ${data.length} свечей для ${eodSymbol}`);
+    if (data.length > 0) {
+      console.log(`📅 Первая свеча: ${data[0].date || data[0].datetime}`);
+      console.log(`📅 Последняя свеча: ${data[data.length - 1].date || data[data.length - 1].datetime}`);
+    }
 
     // Конвертируем в наш формат
     return data.map(candle => ({
