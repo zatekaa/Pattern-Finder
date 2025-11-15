@@ -236,6 +236,11 @@ class DataLoader {
     const data = result.values || [];
     
     console.log(`✅ Twelve Data вернул ${data.length} свечей`);
+    
+    // ⚠️ ВАЖНО: Twelve Data на бесплатном плане ограничен 250 свечами
+    if (data.length >= 250) {
+      console.warn('⚠️ Достигнут лимит Twelve Data (250 свечей на бесплатном плане)');
+    }
 
     // Конвертируем в наш формат
     return data.map(candle => ({

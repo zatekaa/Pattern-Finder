@@ -131,14 +131,26 @@ function UnifiedChart({ symbol, onPatternAnalyzed }) {
             console.log(`✅ Получено ${data.length} свечей через backend`);
             
             // Конвертируем в нужный формат
-            return data.map(candle => ({
-                time: new Date(candle.Date).getTime() / 1000,
-                open: candle.Open,
-                high: candle.High,
-                low: candle.Low,
-                close: candle.Close,
-                volume: candle.Volume
-            }));
+            return data.map(candle => {
+                // Парсим дату (может быть в разных форматах)
+                let timestamp;
+                if (typeof candle.Date === 'number') {
+                    timestamp = candle.Date;
+                } else {
+                    const date = new Date(candle.Date);
+                    timestamp = date.getTime() / 1000;
+                }
+                
+                return {
+                    time: timestamp,
+                    Date: candle.Date, // Сохраняем оригинальную дату
+                    open: candle.Open,
+                    high: candle.High,
+                    low: candle.Low,
+                    close: candle.Close,
+                    volume: candle.Volume
+                };
+            });
         } catch (error) {
             console.error(`❌ Ошибка загрузки через backend: ${error.message}`);
             throw error;
