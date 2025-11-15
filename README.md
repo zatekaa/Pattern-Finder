@@ -23,8 +23,6 @@ second version/
 │       └── assets/
 │           └── css/         # Стили
 │
-├── docs/                # Документация
-│   └── SUPPORTED_ASSETS.md  # Список поддерживаемых активов
 │
 ├── .env.example         # Пример файла .env
 ├── package.json         # Зависимости Node.js

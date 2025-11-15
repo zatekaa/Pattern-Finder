@@ -57,28 +57,8 @@
                 setError('');
 
                 try {
-                    // Для локальной разработки - простая проверка
-                    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                    
-                    if (isLocal) {
-                        // Локальная проверка для разработки
-                        const VALID_USERNAME = 'trader';
-                        const VALID_PASSWORD = 'Murod777';
-                        
-                        if (username === VALID_USERNAME && password === VALID_PASSWORD) {
-                            sessionStorage.setItem('cryptoview_loggedIn', 'true');
-                            sessionStorage.setItem('auth_token', btoa(`${username}:${Date.now()}`));
-                            window.location.href = 'home.html';
-                            return;
-                        } else {
-                            setError('Неверное имя пользователя или пароль');
-                            setIsLoading(false);
-                            return;
-                        }
-                    }
-                    
-                    // Для продакшена - используем Netlify Function
-                    const response = await fetch(getApiUrl(), {
+                    // Отправляем на сервер для проверки через .env
+                    const response = await fetch('/api/login', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

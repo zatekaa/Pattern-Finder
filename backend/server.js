@@ -79,6 +79,34 @@ console.log('='.repeat(60));
 // ============================================
 
 /**
+ * 🔐 API для авторизации
+ */
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+  
+  // Получаем логин и пароль из .env
+  const validUsername = process.env.APP_USERNAME || 'trader';
+  const validPassword = process.env.APP_PASSWORD || 'Murod777';
+  
+  console.log(`🔐 Попытка входа: ${username}`);
+  
+  if (username === validUsername && password === validPassword) {
+    console.log('✅ Авторизация успешна');
+    res.json({
+      success: true,
+      message: 'Авторизация успешна',
+      token: Buffer.from(`${username}:${Date.now()}`).toString('base64')
+    });
+  } else {
+    console.log('❌ Неверный логин или пароль');
+    res.status(401).json({
+      success: false,
+      message: 'Неверное имя пользователя или пароль'
+    });
+  }
+});
+
+/**
  * Главная страница
  */
 app.get('/', (req, res) => {
