@@ -91,9 +91,41 @@ class DataLoader {
         }
       }
     }
-    // КРИПТО
+    // КРИПТО: Приоритет - Twelve Data/EODHD (работают везде), потом Binance
     else if (assetType === 'crypto') {
+      // Пробуем Twelve Data (если есть ключ)
+      if (this.twelveDataKey) {
+        try {
+          console.log('🔄 Пробуем Twelve Data для криптовалюты...');
+          data = await this._loadFromTwelveData(symbol, fromDate, toDate, interval);
+          if (data && data.length > 0) {
+            this._saveToCache(cacheKey, data);
+            console.log(`✅ Загружено ${data.length} свечей из Twelve Data`);
+            return data;
+          }
+        } catch (error) {
+          console.error(`❌ Twelve Data ошибка: ${error.message}`);
+        }
+      }
+
+      // Пробуем EODHD (если есть ключ)
+      if (this.eodApiKey) {
+        try {
+          console.log('🔄 Пробуем EODHD для криптовалюты...');
+          data = await this._loadFromEODHD(symbol, fromDate, toDate, interval);
+          if (data && data.length > 0) {
+            this._saveToCache(cacheKey, data);
+            console.log(`✅ Загружено ${data.length} свечей из EODHD`);
+            return data;
+          }
+        } catch (eodError) {
+          console.error(`❌ EODHD ошибка: ${eodError.message}`);
+        }
+      }
+
+      // Последняя попытка - Binance (может быть заблокирован)
       try {
+        console.log('🔄 Пробуем Binance для криптовалюты...');
         data = await this._loadFromBinance(symbol, fromDate, toDate, interval);
         if (data && data.length > 0) {
           this._saveToCache(cacheKey, data);
@@ -101,20 +133,7 @@ class DataLoader {
           return data;
         }
       } catch (error) {
-        console.error(`❌ Binance ошибка: ${error.message}`);
-        // Фоллбэк на EODHD
-        if (this.eodApiKey) {
-          try {
-            console.log('⚠️ Пробуем EODHD для криптовалюты...');
-            data = await this._loadFromEODHD(symbol, fromDate, toDate, interval);
-            if (data && data.length > 0) {
-              this._saveToCache(cacheKey, data);
-              return data;
-            }
-          } catch (eodError) {
-            console.error(`❌ EODHD тоже не сработал: ${eodError.message}`);
-          }
-        }
+        console.error(`❌ Binance ошибка (возможно заблокирован в регионе): ${error.message}`);
       }
     }
     // АКЦИИ, ИНДЕКСЫ
