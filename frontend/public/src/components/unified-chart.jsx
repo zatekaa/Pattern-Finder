@@ -104,63 +104,45 @@ function UnifiedChart({ symbol, onPatternAnalyzed }) {
         return { symbol, type: 'stocks', name: symbol };
     };
 
-    // Загрузка криптовалют через Binance
+    // Загрузка криптовалют через Backend API (Twelve Data/EODHD)
     const loadCryptoData = async (symbol) => {
-        const binanceSymbol = symbol.toUpperCase().replace('/', '') + 'USDT';
-        console.log(`📡 Загрузка ${binanceSymbol} через Binance (последний год)...`);
+        console.log(`📡 Загрузка ${symbol} через Backend API (Twelve Data/EODHD)...`);
         
-        const allCandles = [];
-        // ИЗМЕНЕНИЕ: Загружаем только последний год
-        const oneYearAgo = new Date();
-        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-        let startTime = oneYearAgo.getTime();
-        const endTime = Date.now();
-        const limit = 1000;
-        const interval = '1d';
-
-        console.log('⏳ Загрузка последнего года...');
-
-            while (startTime < endTime) {
-                // Используем наш Node.js прокси на порту 3000
-                const url = `/api/binance/klines?symbol=${binanceSymbol}&interval=${interval}&startTime=${startTime}&limit=${limit}`;
-                
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error('Ошибка загрузки с Binance');
-                }
-
-                const data = await response.json();
-                
-                // Проверяем что data это массив
-                if (!Array.isArray(data)) {
-                    console.error('❌ Binance вернул не массив:', data);
-                    throw new Error('Binance API error: ' + (data.msg || 'Invalid response'));
-                }
-                
-                if (data.length === 0) break;
-
-                // Конвертируем в наш формат
-                const candles = data.map(candle => ({
-                    Date: new Date(candle[0]).toISOString(),
-                    Open: parseFloat(candle[1]),
-                    High: parseFloat(candle[2]),
-                    Low: parseFloat(candle[3]),
-                    Close: parseFloat(candle[4]),
-                    Volume: parseFloat(candle[5])
-                }));
-
-                allCandles.push(...candles);
-
-                // Следующая порция
-                startTime = data[data.length - 1][0] + 1;
-
-                console.log(`📥 Загружено ${allCandles.length} свечей...`);
-                
-                // Ограничение чтобы не зависнуть
-                if (allCandles.length > 3000) break;
+        // Используем backend API вместо прямого обращения к Binance
+        const toDate = new Date().toISOString().split('T')[0];
+        const fromDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 1 год назад
+        
+        try {
+            const url = `/api/data?symbol=${symbol}&fromDate=${fromDate}&toDate=${toDate}&interval=1d`;
+            console.log(`🔄 Запрос: ${url}`);
+            
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Backend API error: ${response.status}`);
             }
-
-        return allCandles;
+            
+            const data = await response.json();
+            
+            if (!Array.isArray(data)) {
+                console.error('❌ Backend вернул не массив:', data);
+                throw new Error('Invalid response from backend');
+            }
+            
+            console.log(`✅ Получено ${data.length} свечей через backend`);
+            
+            // Конвертируем в нужный формат
+            return data.map(candle => ({
+                time: new Date(candle.Date).getTime() / 1000,
+                open: candle.Open,
+                high: candle.High,
+                low: candle.Low,
+                close: candle.Close,
+                volume: candle.Volume
+            }));
+        } catch (error) {
+            console.error(`❌ Ошибка загрузки через backend: ${error.message}`);
+            throw error;
+        }
     };
 
     // Загрузка акций, форекс, индексов через EOD API
