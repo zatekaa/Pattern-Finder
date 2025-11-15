@@ -91,12 +91,27 @@ class DataLoader {
         }
       }
     }
-    // КРИПТО: Приоритет - Twelve Data/EODHD (работают везде), потом Binance
+    // КРИПТО: Приоритет - EODHD (платный, 30+ лет), потом Twelve Data, потом Binance
     else if (assetType === 'crypto') {
-      // Пробуем Twelve Data (если есть ключ)
+      // 🔥 ПРИОРИТЕТ #1: EODHD (платный план дает полную историю)
+      if (this.eodApiKey) {
+        try {
+          console.log('🔄 Пробуем EODHD для криптовалюты (платный план - полная история)...');
+          data = await this._loadFromEODHD(symbol, fromDate, toDate, interval);
+          if (data && data.length > 0) {
+            this._saveToCache(cacheKey, data);
+            console.log(`✅ Загружено ${data.length} свечей из EODHD (полная история)`);
+            return data;
+          }
+        } catch (eodError) {
+          console.error(`❌ EODHD ошибка: ${eodError.message}`);
+        }
+      }
+
+      // Приоритет #2: Twelve Data (бесплатный, но только 250 свечей)
       if (this.twelveDataKey) {
         try {
-          console.log('🔄 Пробуем Twelve Data для криптовалюты...');
+          console.log('🔄 Пробуем Twelve Data для криптовалюты (лимит 250 свечей)...');
           data = await this._loadFromTwelveData(symbol, fromDate, toDate, interval);
           if (data && data.length > 0) {
             this._saveToCache(cacheKey, data);
@@ -105,21 +120,6 @@ class DataLoader {
           }
         } catch (error) {
           console.error(`❌ Twelve Data ошибка: ${error.message}`);
-        }
-      }
-
-      // Пробуем EODHD (если есть ключ)
-      if (this.eodApiKey) {
-        try {
-          console.log('🔄 Пробуем EODHD для криптовалюты...');
-          data = await this._loadFromEODHD(symbol, fromDate, toDate, interval);
-          if (data && data.length > 0) {
-            this._saveToCache(cacheKey, data);
-            console.log(`✅ Загружено ${data.length} свечей из EODHD`);
-            return data;
-          }
-        } catch (eodError) {
-          console.error(`❌ EODHD ошибка: ${eodError.message}`);
         }
       }
 
