@@ -125,6 +125,32 @@ app.get('/', (req, res) => {
 });
 
 /**
+ * 📊 API для загрузки данных (используется frontend вместо прямых запросов к Binance)
+ */
+app.get('/api/data', async (req, res) => {
+  try {
+    const { symbol, fromDate, toDate, interval = '1d' } = req.query;
+    
+    if (!symbol || !fromDate || !toDate) {
+      return res.status(400).json({
+        error: 'Missing required parameters: symbol, fromDate, toDate'
+      });
+    }
+    
+    console.log(`📊 /api/data запрос: ${symbol}, ${fromDate} - ${toDate}, ${interval}`);
+    
+    const data = await dataLoader.loadData(symbol, fromDate, toDate, interval);
+    
+    res.json(data);
+  } catch (error) {
+    console.error(`❌ Ошибка /api/data: ${error.message}`);
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+/**
  * Healthcheck
  */
 app.get('/api/health', (req, res) => {

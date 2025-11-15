@@ -1288,21 +1288,34 @@ class FinancialDataAPI {
     }
 
     async getBinanceData(symbol, interval = '5m', limit = 1500) {
-        // Binance использует формат символов с USDT для криптовалют
-        // МАКСИМУМ: 1500 свечей (лимит API)
-        let binanceSymbol = symbol;
-        if (!symbol.endsWith('USDT') && !symbol.endsWith('BUSD')) {
-            binanceSymbol = symbol + 'USDT';
-        }
+        // 🔄 ИСПОЛЬЗУЕМ BACKEND API вместо прямого обращения к Binance
+        // Backend автоматически выберет: Twelve Data → EODHD → Binance
+        console.log(`🔄 Загружаем ${symbol} через backend API...`);
         
-        // Для минутных интервалов убеждаемся, что запрашиваем достаточно данных
-        if (interval === '1m' && limit < 1000) {
-            limit = 1000; // Минимум 1000 свечей для хорошего поиска паттернов
-        }
+        // Конвертируем limit в период (примерно)
+        const days = Math.ceil(limit / (24 * 60 / parseInt(interval)));
+        const toDate = new Date().toISOString().split('T')[0];
+        const fromDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         
-        const response = await fetch(
-            `${this.apis.binance}/klines?symbol=${binanceSymbol}&interval=${interval}&limit=${limit}`
-        );
+        try {
+            const response = await fetch(`/api/data?symbol=${symbol}&fromDate=${fromDate}&toDate=${toDate}&interval=${interval}`);
+            
+            if (!response.ok) {
+                throw new Error(`Backend API error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (!data || !Array.isArray(data)) {
+                throw new Error('Invalid data format from backend');
+            }
+            
+            console.log(`✅ Получено ${data.length} свечей через backend`);
+            return data;
+        } catch (error) {
+            console.error(`❌ Ошибка загрузки через backend: ${error.message}`);
+            throw error;
+        }
         
         if (!response.ok) {
             // Пробуем альтернативные форматы символов
